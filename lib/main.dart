@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:arkit_plugin/arkit_plugin.dart';
+import 'package:flutter/services.dart';
 import 'package:vector_math/vector_math_64.dart' as vector;
 
 void main() => runApp(MaterialApp(home: MyApp()));
@@ -12,6 +13,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  static const platform = const MethodChannel('com.baloise/ARKit');
   ARKitController arkitController;
   String anchorId;
   ARKitSphere sphere;
@@ -25,67 +27,23 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) => Scaffold(
       appBar: AppBar(title: const Text('ARKit in Flutter')),
-      body: ARKitSceneView(
-          onARKitViewCreated: onARKitViewCreated,
-          showFeaturePoints: true,
-          showWorldOrigin: true,
-          enableTapRecognizer: true,
-          planeDetection: ARPlaneDetection.horizontalAndVertical
-      ));
+      body: Container(child: RaisedButton(child: Text('start AR'), onPressed: _getBatteryLevel,)));
 
-  void onARKitViewCreated(ARKitController arkitController) {
-    this.arkitController = arkitController;
-    final material = ARKitMaterial(
-    diffuse: ARKitMaterialProperty(
-    color: Colors.yellow,
-    ));
-    sphere = ARKitSphere(
-      materials: [material],
-      radius: 0.1,
-    );
 
-    final node = ARKitNode(
-      name: 'sphere',
-      geometry: sphere,
-      position: vector.Vector3(0, 0, -0.5),
-    );
-    this.arkitController.add(node);
-    //this.arkitController.onAddNodeForAnchor = _handleAddAnchor;
-    this.arkitController.onARTap = (results) => onTapHandler(results);
-    //this.arkitController.onNodeTap = (nodes) => onNodeTapHandler(nodes);
-  }
+  String _batteryLevel = 'Unknown battery level.';
 
-  void _handleAddAnchor(ARKitAnchor anchor) {
-    if (anchor is ARKitPlaneAnchor) {
-      _addPlane(arkitController, anchor);
+  Future<void> _getBatteryLevel() async {
+    String batteryLevel;
+    try {
+      final int result = await platform.invokeMethod('getBatteryLevel');
+      batteryLevel = 'Battery level at $result % .';
+    } on PlatformException catch (e) {
+      batteryLevel = "Failed to get battery level: '${e.message}'.";
     }
-  }
 
-  void _addPlane(ARKitController controller, ARKitPlaneAnchor anchor) {
-    anchorId = anchor.identifier;
-    final node =  ARKitNode(
-        geometry: ARKitSphere(radius: 0.1), position: vector.Vector3(0, 0, -0.5));
-    this.arkitController.add(node);
+    print(batteryLevel);
+    setState(() {
+      _batteryLevel = batteryLevel;
+    });
   }
-
-  void onTapHandler(List<ARKitTestResult> results) {
-    final color = sphere.materials.value.first.diffuse.color == Colors.green
-        ? Colors.red
-        : Colors.green;
-    sphere.materials.value = [
-      ARKitMaterial(diffuse: ARKitMaterialProperty(color: color))
-    ];
-    log( "Tap found" + results.length.toString());
-    if(results.isEmpty){
-      return;
-    } else {
-      results.forEach((element) {
-         vector.Vector4 vector4 = element.worldTransform.getColumn(3);
-         final node =  ARKitNode(
-             geometry: ARKitSphere(radius: 0.1), position: vector.Vector3(vector4.x, vector4.y, vector4.z));
-         this.arkitController.add(node);
-      });
-    }
-  }
-
 }
