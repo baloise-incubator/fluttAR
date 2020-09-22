@@ -15,8 +15,8 @@ import SwiftUI
       batteryChannel.setMethodCallHandler({
         [weak self] (call: FlutterMethodCall, result: FlutterResult) -> Void in
       
-        let contentView = ContentView()
-        var child = UIHostingController(rootView: contentView)
+//        let contentView = ContentView()
+        var child = GameViewController()
         child.view.frame = self?.window.rootViewController?.view.frame ?? child.view.frame
         child.modalPresentationStyle = .fullScreen
         self?.window?.rootViewController?.present(child, animated: false)
