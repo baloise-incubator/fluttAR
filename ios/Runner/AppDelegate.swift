@@ -17,6 +17,8 @@ import SwiftUI
       
         let contentView = ContentView()
         var child = UIHostingController(rootView: contentView)
+        child.view.frame = self?.window.rootViewController?.view.frame ?? child.view.frame
+        self?.window?.rootViewController?.present(child, animated: false)
         self?.window?.rootViewController?.present(child, animated: false)
         self?.window.makeKeyAndVisible()
         
