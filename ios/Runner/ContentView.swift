@@ -8,6 +8,8 @@
 import SwiftUI
 import RealityKit
 import ARKit
+import CoreLocation
+import ARKit_CoreLocation
 
 struct ContentView :View {
     
@@ -20,17 +22,59 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate, ARSessi
     
     @IBOutlet var arview : ARView!
     
+    var sceneLocation : SceneLocationView!
+    
+    var arTrackingType = SceneLocationView.ARTrackingType.orientationTracking
+    var scalingScheme = ScalingScheme.normal
+    
+    var continuallyAdjustNodePositionWhenWithinRange = true
+    var continuallyUpdatePositionAndScale = true
+    var annotationHeightAdjustmentFactor = 1.1
+    
     override func viewDidLoad() {
         print("Test")
         
         super.viewDidLoad()
-        arview = ARViewContainer().makeUIView()
-        arview.session.delegate = self
+     
+//        arview = ARViewContainer().makeUIView()
+//        arview.session.delegate = self
         view.isUserInteractionEnabled = true
-        arview.isUserInteractionEnabled = true
+
+        sceneLocation = SceneLocationView.init(trackingType : .worldTracking)
+        sceneLocation.debugOptions = [.showFeaturePoints, .showWorldOrigin]
+        sceneLocation.session.delegate = self
+        sceneLocation.showAxesNode = true
+        sceneLocation.run()
+        sceneLocation.isUserInteractionEnabled = true
+        view.addSubview(sceneLocation)
         setupGestures()
-        view.addSubview(arview)
+        //view.addSubview(arview)
         
+        let coordinate = CLLocationCoordinate2D(latitude: 46.536671, longitude: 7.962324)
+        let location = CLLocation(coordinate: coordinate, altitude: 4158)
+        //let image = UIImage(named: "pin")!
+
+        //let annotationNode = LocationAnnotationNode(location: location, image: image)
+        let annotationNode = LocationAnnotationNode(location: location,
+                                                    view: UIView.prettyLabeledView(text: "Jungfrau", backgroundColor: UIColor.orange, borderColor: UIColor.black))
+        addScenewideNodeSettings(annotationNode)
+        sceneLocation.addLocationNodeWithConfirmedLocation(locationNode: annotationNode)
+    }
+    
+    func addScenewideNodeSettings(_ node: LocationNode) {
+        if let annoNode = node as? LocationAnnotationNode {
+            annoNode.annotationHeightAdjustmentFactor = annotationHeightAdjustmentFactor
+        }
+        node.scalingScheme = .normal
+        
+        node.continuallyAdjustNodePositionWhenWithinRange = continuallyAdjustNodePositionWhenWithinRange
+        node.continuallyUpdatePositionAndScale = continuallyUpdatePositionAndScale
+    }
+    
+    override func viewDidLayoutSubviews() {
+      super.viewDidLayoutSubviews()
+
+      sceneLocation.frame = view.bounds
     }
     
     private func setupGestures(){
@@ -38,29 +82,33 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate, ARSessi
         let taprecognizer = UITapGestureRecognizer(target: self, action: #selector(onTap(_:)))
         taprecognizer.numberOfTouchesRequired = 1
         taprecognizer.delegate = self
-        arview.addGestureRecognizer(taprecognizer)
+        sceneLocation.addGestureRecognizer(taprecognizer)
     }
     
     @IBAction
     func onTap(_ sender: UITapGestureRecognizer) {
         
         print("tap found")
-        let tapLocation: CGPoint = sender.location(in: arview)
-        let result: [CollisionCastHit] = arview.hitTest(tapLocation)
+        let tapLocation: CGPoint = sender.location(in: sceneLocation)
+        let result: [SCNHitTestResult] = sceneLocation.hitTest(tapLocation)
         
-        guard let hitTest: CollisionCastHit = result.first
+        guard let hitTest: SCNHitTestResult = result.first
         else { return }
         
-        addObject(position: hitTest.position)
-        let entity: Entity = hitTest.entity
-        print(entity.name)
+        addObject(position: hitTest.worldCoordinates)
+        //let entity: Entity = hitTest.entity
+        //print(entity.name)
     }
     
-    func addObject(position: SIMD3<Float>) {
+    func addObject(position: SCNVector3) {
         print("adding object at point: \(position)")
-        let boxAnchor = try! Experience.loadBox()
-        boxAnchor.position = position
-        arview.scene.anchors.append(boxAnchor)
+        
+        let image = UIImage(named: "pin")!
+        let currentLocationNode = LocationAnnotationNode(location: nil, image: image)
+        sceneLocation.addLocationNodeForCurrentPosition(locationNode: currentLocationNode)
+        //let boxAnchor = try! Experience.loadBox()
+        //boxAnchor.position = position
+        //arview.scene.anchors.append(boxAnchor)
     }
     
     
@@ -74,7 +122,7 @@ struct ARViewContainer: UIViewRepresentable {
         let configuration = ARWorldTrackingConfiguration()
         configuration.planeDetection = [.horizontal, .vertical]
         arView.session.run(configuration)
-        
+    
         
         let anchor = AnchorEntity(.plane([.horizontal, .vertical],
                                          classification: [.wall, .table, .floor],
@@ -117,6 +165,37 @@ struct ARViewContainer: UIViewRepresentable {
     
     func updateUIView(_ uiView: ARView, context: Context) {
     }
+
     
+}
+
+extension UIView {
+    /// Create a colored view with label, border, and rounded corners.
+    class func prettyLabeledView(text: String,
+                                 backgroundColor: UIColor = .systemBackground,
+                                 borderColor: UIColor = .black) -> UIView {
+        let font = UIFont.preferredFont(forTextStyle: .title2)
+        let fontAttributes = [NSAttributedString.Key.font: font]
+        let size = (text as NSString).size(withAttributes: fontAttributes)
+        let label = UILabel(frame: CGRect(x: 0, y: 0, width: size.width, height: size.height))
+
+        let attributedString = NSAttributedString(string: text, attributes: [NSAttributedString.Key.font: font])
+        label.attributedText = attributedString
+        label.textAlignment = .center
+        label.adjustsFontForContentSizeCategory = true
+
+        let cframe = CGRect(x: 0, y: 0, width: label.frame.width + 20, height: label.frame.height + 10)
+        let cview = UIView(frame: cframe)
+        cview.translatesAutoresizingMaskIntoConstraints = false
+        cview.layer.cornerRadius = 10
+        cview.layer.backgroundColor = backgroundColor.cgColor
+        cview.layer.borderColor = borderColor.cgColor
+        cview.layer.borderWidth = 1
+        cview.addSubview(label)
+        label.center = cview.center
+
+        return cview
+    }
+
 }
 
