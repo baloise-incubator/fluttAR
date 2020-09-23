@@ -38,6 +38,18 @@ class _MyAppState extends State<MyApp> {
   Future<void> _startARSesssionAndSetLocations() async {
     _startARSesssion();
     _transmitLocationInformation();
+
+    platform.setMethodCallHandler((MethodCall call) async {
+      print("Flutter received call for" + call.method);
+      if(call.method == "dispatchLocation") {
+        print("Arguments received are : ${call.arguments}");
+        var arguments = call.arguments;
+          Location location = new Location(
+              arguments[0], arguments[1], arguments[2]);
+          _persistToDB(location);
+        }
+    });
+
   }
 
   Future<void> _startARSesssion() async {
@@ -59,4 +71,9 @@ class _MyAppState extends State<MyApp> {
       print("Location not send - " + e.toString());
     }
   }
+
+  Future<void> _persistToDB(Location location) async {
+    print("Saving information");
+  }
+
 }
