@@ -1,5 +1,7 @@
 import 'dart:developer';
+import 'dart:ffi';
 
+import 'package:fluttAR/Location.dart';
 import 'package:flutter/material.dart';
 import 'package:arkit_plugin/arkit_plugin.dart';
 import 'package:flutter/services.dart';
@@ -27,23 +29,34 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) => Scaffold(
       appBar: AppBar(title: const Text('ARKit in Flutter')),
-      body: Container(child: RaisedButton(child: Text('start AR'), onPressed: _getBatteryLevel,)));
+      body: Container(
+          child: RaisedButton(
+        child: Text('start AR'),
+        onPressed: _startARSesssionAndSetLocations,
+      )));
 
+  Future<void> _startARSesssionAndSetLocations() async {
+    _startARSesssion();
+    _transmitLocationInformation();
+  }
 
-  String _batteryLevel = 'Unknown battery level.';
-
-  Future<void> _getBatteryLevel() async {
-    String batteryLevel;
+  Future<void> _startARSesssion() async {
     try {
-      final int result = await platform.invokeMethod('getBatteryLevel');
-      batteryLevel = 'Battery level at $result % .';
+      final int result = await platform.invokeMethod('startARSession');
+      print("AR Session started");
     } on PlatformException catch (e) {
-      batteryLevel = "Failed to get battery level: '${e.message}'.";
+      print("AR Session not started - " + e.toString());
     }
+  }
 
-    print(batteryLevel);
-    setState(() {
-      _batteryLevel = batteryLevel;
-    });
+  Future<void> _transmitLocationInformation() async {
+    try {
+      Location loc = new Location(46.536671, 7.962324, 4158);
+      List<double> list = {loc.latitude, loc.longitude, loc.meterOverNull}.toList();
+      final int result = await platform.invokeMethod('setLocation', list);
+      print("Location send");
+    } on PlatformException catch (e) {
+      print("Location not send - " + e.toString());
+    }
   }
 }

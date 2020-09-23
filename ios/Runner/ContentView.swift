@@ -26,6 +26,7 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate, ARSessi
     
     var arTrackingType = SceneLocationView.ARTrackingType.orientationTracking
     var scalingScheme = ScalingScheme.normal
+    var flutterMethodHandler : FlutterMethodHandler!
     
     var continuallyAdjustNodePositionWhenWithinRange = true
     var continuallyUpdatePositionAndScale = true
@@ -57,6 +58,16 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate, ARSessi
         //let annotationNode = LocationAnnotationNode(location: location, image: image)
         let annotationNode = LocationAnnotationNode(location: location,
                                                     view: UIView.prettyLabeledView(text: "Jungfrau", backgroundColor: UIColor.orange, borderColor: UIColor.black))
+        addScenewideNodeSettings(annotationNode)
+        sceneLocation.addLocationNodeWithConfirmedLocation(locationNode: annotationNode)
+    }
+    
+    func addNodeAtSpecifiedLocation( lat : Double, long : Double, alt : Double){
+        let location = CLLocation(coordinate: CLLocationCoordinate2D(latitude: lat, longitude: long), altitude: alt)
+        let image = UIImage(named: "pin")!
+
+        let annotationNode = LocationAnnotationNode(location: location, image: image)
+        
         addScenewideNodeSettings(annotationNode)
         sceneLocation.addLocationNodeWithConfirmedLocation(locationNode: annotationNode)
     }
@@ -106,11 +117,8 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate, ARSessi
         let image = UIImage(named: "pin")!
         let currentLocationNode = LocationAnnotationNode(location: nil, image: image)
         sceneLocation.addLocationNodeForCurrentPosition(locationNode: currentLocationNode)
-        //let boxAnchor = try! Experience.loadBox()
-        //boxAnchor.position = position
-        //arview.scene.anchors.append(boxAnchor)
+        flutterMethodHandler.dispatchLocation(location: currentLocationNode.location)
     }
-    
     
 }
 

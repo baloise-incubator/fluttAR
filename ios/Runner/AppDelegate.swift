@@ -4,39 +4,17 @@ import SwiftUI
 
 @UIApplicationMain
 @objc class AppDelegate: FlutterAppDelegate {
-  override func application(
-    _ application: UIApplication,
-    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-
-   
-      let controller : FlutterViewController = window?.rootViewController as! FlutterViewController
-      let batteryChannel = FlutterMethodChannel(name: "com.baloise/ARKit",
-                                                binaryMessenger: controller.binaryMessenger)
-      batteryChannel.setMethodCallHandler({
-        [weak self] (call: FlutterMethodCall, result: FlutterResult) -> Void in
-      
-//        let contentView = ContentView()
-        var child = GameViewController()
-        child.view.frame = self?.window.rootViewController?.view.frame ?? child.view.frame
-        child.modalPresentationStyle = .fullScreen
-        self?.window?.rootViewController?.present(child, animated: false)
-        self?.window.makeKeyAndVisible()
-        
-      })
-
-      GeneratedPluginRegistrant.register(with: self)
-      return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+    
+    var flutterMethodHandler :FlutterMethodHandler!
+    
+    override func application(
+        _ application: UIApplication,
+        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        flutterMethodHandler = FlutterMethodHandler(window: self.window)
+        flutterMethodHandler.setupMethodCallHandler()
+        GeneratedPluginRegistrant.register(with: self)
+        return super.application(application, didFinishLaunchingWithOptions: launchOptions)
     }
     
-    private func receiveBatteryLevel(result: FlutterResult) {
-      let device = UIDevice.current
-      device.isBatteryMonitoringEnabled = true
-      if device.batteryState == UIDevice.BatteryState.unknown {
-        result(FlutterError(code: "UNAVAILABLE",
-                            message: "Battery info unavailable",
-                            details: nil))
-      } else {
-        result(Int(device.batteryLevel * 100))
-      }
-    }
+    
 }
