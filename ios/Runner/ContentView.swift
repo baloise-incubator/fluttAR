@@ -24,7 +24,7 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate, ARSessi
     
     var continuallyAdjustNodePositionWhenWithinRange = true
     var continuallyUpdatePositionAndScale = true
-    var annotationHeightAdjustmentFactor = 1.1
+    var annotationHeightAdjustmentFactor = 0.1
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -49,14 +49,9 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate, ARSessi
        
         setupGestures()
     
+        addNodeAtSpecifiedLocation(lat: 46.655417, long: 7.771430, alt: 575, name: "Leissingen")
+        addNodeAtSpecifiedLocation(lat: 46.577619, long: 8.005736, alt: 3970, name: "Eiger")
         
-        let coordinate = CLLocationCoordinate2D(latitude: 46.536671, longitude: 7.962324)
-        let location = CLLocation(coordinate: coordinate, altitude: 4158)
-    
-        let annotationNode = LocationAnnotationNode(location: location,
-                                                    view: UIView.prettyLabeledView(text: "Jungfrau", backgroundColor: UIColor.orange, borderColor: UIColor.black))
-        addScenewideNodeSettings(annotationNode)
-        sceneLocation.addLocationNodeWithConfirmedLocation(locationNode: annotationNode)
         
         sceneLocation.run()
     }
