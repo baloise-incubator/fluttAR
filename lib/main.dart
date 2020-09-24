@@ -71,7 +71,7 @@ class MyAppState extends State<MyApp> {
         },
         children: [
           ArPageWidget(),
-          MapPageWidget(_center, this),
+          MapPageWidget(_center),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
