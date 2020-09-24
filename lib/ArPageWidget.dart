@@ -11,7 +11,6 @@ class ArPageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-      appBar: AppBar(title: const Text('ARKit in Flutter')),
       body: Container(
           child: RaisedButton(
         child: Text('start AR'),

@@ -22,9 +22,7 @@ class _MyAppState extends State<MyApp> {
   List<BottomNavigationBarItem> buildBottomNavBarItems() {
     return [
       BottomNavigationBarItem(
-          icon: new Icon(Icons.photo_camera),
-          title: new Text('AR')
-      ),
+          icon: new Icon(Icons.photo_camera), title: new Text('AR')),
       BottomNavigationBarItem(
         icon: new Icon(Icons.map),
         title: new Text('MAP'),
@@ -41,7 +39,8 @@ class _MyAppState extends State<MyApp> {
   void bottomTapped(int index) {
     setState(() {
       bottomSelectedIndex = index;
-      _controller.animateToPage(index, duration: Duration(milliseconds: 500), curve: Curves.ease);
+      _controller.animateToPage(index,
+          duration: Duration(milliseconds: 500), curve: Curves.ease);
     });
   }
 
@@ -51,11 +50,12 @@ class _MyAppState extends State<MyApp> {
       appBar: AppBar(
         title: Text("FluttAR"),
       ),
-      body:  PageView(
+      body: PageView(
         controller: _controller,
+        physics: NeverScrollableScrollPhysics(),
         onPageChanged: (index) {
           pageChanged(index);
-        } ,
+        },
         children: [
           ArPageWidget(),
           MapPageWidget(),
