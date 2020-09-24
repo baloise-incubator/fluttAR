@@ -17,20 +17,63 @@ class _MyAppState extends State<MyApp> {
     initialPage: 0,
   );
 
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
+  int bottomSelectedIndex = 0;
+
+  List<BottomNavigationBarItem> buildBottomNavBarItems() {
+    return [
+      BottomNavigationBarItem(
+          icon: new Icon(Icons.photo_camera),
+          title: new Text('AR')
+      ),
+      BottomNavigationBarItem(
+        icon: new Icon(Icons.map),
+        title: new Text('MAP'),
+      ),
+    ];
+  }
+
+  void pageChanged(int index) {
+    setState(() {
+      bottomSelectedIndex = index;
+    });
+  }
+
+  void bottomTapped(int index) {
+    setState(() {
+      bottomSelectedIndex = index;
+      _controller.animateToPage(index, duration: Duration(milliseconds: 500), curve: Curves.ease);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return PageView(
-      controller: _controller,
-      children: [
-        ArPageWidget(),
-        MapPageWidget(),
-      ],
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("FluttAR"),
+      ),
+      body:  PageView(
+        controller: _controller,
+        onPageChanged: (index) {
+          pageChanged(index);
+        } ,
+        children: [
+          ArPageWidget(),
+          MapPageWidget(),
+        ],
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: bottomSelectedIndex,
+        onTap: (index) {
+          bottomTapped(index);
+        },
+        items: buildBottomNavBarItems(),
+      ),
     );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 }
