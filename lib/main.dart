@@ -25,8 +25,6 @@ class _MyAppState extends State<MyApp> {
     super.dispose();
   }
 
-
-
   @override
   Widget build(BuildContext context) => Scaffold(
       appBar: AppBar(title: const Text('ARKit in Flutter')),
@@ -35,24 +33,25 @@ class _MyAppState extends State<MyApp> {
           showFeaturePoints: true,
           showWorldOrigin: true,
           enableTapRecognizer: true,
-          planeDetection: ARPlaneDetection.horizontalAndVertical
-      ));
+          worldAlignment: ARWorldAlignment.gravityAndHeading,
+          planeDetection: ARPlaneDetection.horizontalAndVertical));
 
   void onARKitViewCreated(ARKitController arkitController) {
     this.arkitController = arkitController;
+
     final material = ARKitMaterial(
-    diffuse: ARKitMaterialProperty(
-    color: Colors.yellow,
+        diffuse: ARKitMaterialProperty(
+      color: Colors.red,
     ));
     sphere = ARKitSphere(
       materials: [material],
-      radius: 0.1,
+      radius: 100,
     );
 
     final node = ARKitNode(
       name: 'sphere',
       geometry: sphere,
-      position: vector.Vector3(0, 0, -0.5),
+        position: vector.Vector3(16965.795, 0.0, 21009.636)
     );
     this.arkitController.add(node);
     //this.arkitController.onAddNodeForAnchor = _handleAddAnchor;
@@ -80,24 +79,24 @@ class _MyAppState extends State<MyApp> {
     sphere.materials.value = [
       ARKitMaterial(diffuse: ARKitMaterialProperty(color: color))
     ];
-    log( "Tap found" + results.length.toString());
-    if(results.isEmpty){
+    log("Tap found" + results.length.toString());
+    if (results.isEmpty) {
       return;
     } else {
-      log("Hallo");
+      vector.Vector4 vector4 = results.first.worldTransform.getColumn(3);
+      final node = ARKitNode(
+          geometry: ARKitSphere(radius: 0.1),
+          position: vector.Vector3(vector4.x, vector4.y, vector4.z));
+      log("Added Node to x - " +
+          vector4.x.toString() +
+          "y - " +
+          vector4.y.toString() +
+          "z - " +
+          vector4.z.toString());
+      // this.nodeList.add(vector4.x.toString() +vector4.y.toString() + vector4.z.toString());
+      _getlocation();
 
-      results.forEach((element) {
-        vector.Vector4 vector4 = element.worldTransform.getColumn(3);
-        // print("Anchor Identifier:" + element.anchor.identifier);
-        // print("Anchor NodeName:" + element.anchor.nodeName);
-        // print("Distance: " + element.distance.toString());
-
-         final node =  ARKitNode(geometry: ARKitSphere(radius: 0.1), position: vector.Vector3(vector4.x, vector4.y, vector4.z));
-        log("Added Node to x - " + vector4.x.toString() + "y - " + vector4.y.toString() + "z - " + vector4.z.toString());
-        // this.nodeList.add(vector4.x.toString() +vector4.y.toString() + vector4.z.toString());
-        _getlocation();
-        this.arkitController.add(node);
-      });
+      this.arkitController.add(node);
     }
   }
 
@@ -125,6 +124,11 @@ class _MyAppState extends State<MyApp> {
     }
 
     _locationData = await location.getLocation();
-    log("alt: " + _locationData.altitude.toString() + " lat: " + _locationData.latitude.toString() + " long: " + _locationData.longitude.toString());
+    log("alt: " +
+        _locationData.altitude.toString() +
+        " lat: " +
+        _locationData.latitude.toString() +
+        " long: " +
+        _locationData.longitude.toString());
   }
 }
