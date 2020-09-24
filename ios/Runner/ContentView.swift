@@ -52,7 +52,6 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate, ARSessi
         addNodeAtSpecifiedLocation(lat: 46.655417, long: 7.771430, alt: 575, name: "Leissingen")
         addNodeAtSpecifiedLocation(lat: 46.577619, long: 8.005736, alt: 3970, name: "Eiger")
         
-        
         sceneLocation.run()
     }
     

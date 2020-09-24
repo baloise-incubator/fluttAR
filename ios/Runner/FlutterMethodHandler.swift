@@ -32,6 +32,7 @@ class FlutterMethodHandler {
             case "setLocation":
                 print("setLocationCalled")
                 let arguments = call.arguments as! Array<Any>
+                print(arguments.description)
                 guard arguments.count == 4 else {
                     break
                 }

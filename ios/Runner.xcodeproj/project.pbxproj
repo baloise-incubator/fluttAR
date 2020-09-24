@@ -16,7 +16,7 @@
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
 		A52ABA962519E55700087C55 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A52ABA942519E55700087C55 /* ContentView.swift */; };
 		A52ABA972519E55700087C55 /* Experience.rcproject in Sources */ = {isa = PBXBuildFile; fileRef = A52ABA952519E55700087C55 /* Experience.rcproject */; };
-		A52ABA9F251A34C900087C55 /* ARCL in Frameworks */ = {isa = PBXBuildFile; productRef = A52ABA9E251A34C900087C55 /* ARCL */; };
+		A52ABA9F251A34C900087C55 /* BuildFile in Frameworks */ = {isa = PBXBuildFile; productRef = A52ABA9E251A34C900087C55 /* SwiftPackageProductDependency */; };
 		A52ABAA1251A363200087C55 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A52ABAA0251A363200087C55 /* Assets.xcassets */; };
 		A52ABAA5251B3EF100087C55 /* FlutterMethodHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A52ABAA4251B3EF100087C55 /* FlutterMethodHandler.swift */; };
 		A5FC57E3251CCF4B009E8AE7 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = A5FC57E2251CCF4B009E8AE7 /* GoogleService-Info.plist */; };
@@ -65,7 +65,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A52ABA9F251A34C900087C55 /* ARCL in Frameworks */,
+				A52ABA9F251A34C900087C55 /* BuildFile in Frameworks */,
 				19D76A588DE912BF189376D0 /* Pods_Runner.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -156,6 +156,7 @@
 				9705A1C41CF9048500538489 /* Embed Frameworks */,
 				3B06AD1E1E4923F5004D2608 /* Thin Binary */,
 				8352C0CD0E7953AA30D57715 /* [CP] Embed Pods Frameworks */,
+				F221FEC9EFADC26F5BDF336C /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -163,7 +164,7 @@
 			);
 			name = Runner;
 			packageProductDependencies = (
-				A52ABA9E251A34C900087C55 /* ARCL */,
+				A52ABA9E251A34C900087C55 /* SwiftPackageProductDependency */,
 			);
 			productName = Runner;
 			productReference = 97C146EE1CF9000F007C117D /* Runner.app */;
@@ -194,7 +195,7 @@
 			);
 			mainGroup = 97C146E51CF9000F007C117D;
 			packageReferences = (
-				A52ABA9D251A34C900087C55 /* XCRemoteSwiftPackageReference "ARKit-CoreLocation" */,
+				A52ABA9D251A34C900087C55 /* RemoteSwiftPackageReference */,
 			);
 			productRefGroup = 97C146EF1CF9000F007C117D /* Products */;
 			projectDirPath = "";
@@ -287,6 +288,23 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		F221FEC9EFADC26F5BDF336C /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -600,7 +618,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		A52ABA9D251A34C900087C55 /* XCRemoteSwiftPackageReference "ARKit-CoreLocation" */ = {
+		A52ABA9D251A34C900087C55 /* RemoteSwiftPackageReference */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/ProjectDent/ARKit-CoreLocation";
 			requirement = {
@@ -611,9 +629,9 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		A52ABA9E251A34C900087C55 /* ARCL */ = {
+		A52ABA9E251A34C900087C55 /* SwiftPackageProductDependency */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A52ABA9D251A34C900087C55 /* XCRemoteSwiftPackageReference "ARKit-CoreLocation" */;
+			package = A52ABA9D251A34C900087C55 /* RemoteSwiftPackageReference */;
 			productName = ARCL;
 		};
 /* End XCSwiftPackageProductDependency section */

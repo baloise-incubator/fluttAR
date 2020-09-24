@@ -1,6 +1,10 @@
+import 'package:fluttAR/DatabaseHandler.dart';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:geolocator/geolocator.dart';
 
 import 'ArPageWidget.dart';
+import 'Location.dart';
 import 'MapPageWidget.dart';
 
 void main() {
@@ -9,13 +13,30 @@ void main() {
 
 class MyApp extends StatefulWidget {
   @override
-  _MyAppState createState() => _MyAppState();
+  MyAppState createState() => MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class MyAppState extends State<MyApp> {
   PageController _controller = PageController(
     initialPage: 0,
   );
+
+  LatLng _center = LatLng(46.689520, 7.762714);
+  DataBaseHandler handler = DataBaseHandler();
+  ArPageWidget arPage;
+  MapPageWidget mapPage;
+
+  @override
+  void initState(){
+    super.initState();
+    GeolocatorPlatform.instance.getCurrentPosition().then((value) =>
+    _center = LatLng(value.latitude, value.longitude));
+    arPage = ArPageWidget(handler);
+    mapPage = MapPageWidget(handler, _center, this);
+    //List<Function> functionList = new List<Function>();
+    //functionList.add((loc) =>{ mapPage.receivedLocationInformation(loc)});
+    //handler.addListeners(functionList);
+  }
 
   int bottomSelectedIndex = 0;
 
@@ -57,8 +78,8 @@ class _MyAppState extends State<MyApp> {
           pageChanged(index);
         },
         children: [
-          ArPageWidget(),
-          MapPageWidget(),
+          arPage,
+          mapPage,
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
