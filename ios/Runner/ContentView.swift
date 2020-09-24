@@ -31,6 +31,10 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate, ARSessi
     var continuallyAdjustNodePositionWhenWithinRange = true
     var continuallyUpdatePositionAndScale = true
     var annotationHeightAdjustmentFactor = 1.1
+    var basicNodes = [
+        ScavengerHuntNode(1, 46.536671, 7.962324, 4158, false),
+        ScavengerHuntNode(2, 46.536671, 7.962324, 4158, false)
+    ]
     
     override func viewDidLoad() {
         print("Test")
@@ -51,8 +55,10 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate, ARSessi
         setupGestures()
         //view.addSubview(arview)
         
-        let coordinate = CLLocationCoordinate2D(latitude: 46.536671, longitude: 7.962324)
-        let location = CLLocation(coordinate: coordinate, altitude: 4158)
+        let firstNode = getNextNode()
+        
+        let coordinate = CLLocationCoordinate2D(latitude: firstNode.lat, longitude: firstNode.long)
+        let location = CLLocation(coordinate: coordinate, altitude: firstNode.alt)
         //let image = UIImage(named: "pin")!
 
         //let annotationNode = LocationAnnotationNode(location: location, image: image)
@@ -60,6 +66,10 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate, ARSessi
                                                     view: UIView.prettyLabeledView(text: "Jungfrau", backgroundColor: UIColor.orange, borderColor: UIColor.black))
         addScenewideNodeSettings(annotationNode)
         sceneLocation.addLocationNodeWithConfirmedLocation(locationNode: annotationNode)
+    }
+    
+    func getNextNode() -> ScavengerHuntNode {
+        basicNodes.filter({ !$0.isTapped })?[0]
     }
     
     func addNodeAtSpecifiedLocation( lat : Double, long : Double, alt : Double){
@@ -99,16 +109,26 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate, ARSessi
     @IBAction
     func onTap(_ sender: UITapGestureRecognizer) {
         
-        print("tap found")
-        let tapLocation: CGPoint = sender.location(in: sceneLocation)
-        let result: [SCNHitTestResult] = sceneLocation.hitTest(tapLocation)
-        
-        guard let hitTest: SCNHitTestResult = result.first
-        else { return }
-        
-        addObject(position: hitTest.worldCoordinates)
+//        print("tap found")
+//        let tapLocation: CGPoint = sender.location(in: sceneLocation)
+//        let result: [SCNHitTestResult] = sceneLocation.hitTest(tapLocation)
+//
+//        guard let hitTest: SCNHitTestResult = result.first
+//        else { return }
+//
+//        addObject(position: hitTest.worldCoordinates)
         //let entity: Entity = hitTest.entity
         //print(entity.name)
+        
+        if sender.state == .ended {
+            let location: CGPoint = sender.location(in: sceneLocationView)
+            let hits = sceneLocation.hitTest(location, options: nil)
+            if !hits.isEmpty{
+
+                let tappedNode = hits.first?.node
+                print("YES BABY NODE TAPPED", tappedNode?.name)
+            }
+        }
     }
     
     func addObject(position: SCNVector3) {
