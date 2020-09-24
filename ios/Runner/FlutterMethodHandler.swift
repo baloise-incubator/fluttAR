@@ -21,7 +21,7 @@ class FlutterMethodHandler {
     func setupMethodCallHandler() {
         let controller : FlutterViewController = window?.rootViewController as! FlutterViewController
         methodChannel = FlutterMethodChannel(name: "com.baloise/ARKit",
-                                                 binaryMessenger: controller.binaryMessenger)
+                                             binaryMessenger: controller.binaryMessenger)
         
         methodChannel.setMethodCallHandler({
             [weak self] (call: FlutterMethodCall, result: FlutterResult) -> Void in
@@ -31,15 +31,21 @@ class FlutterMethodHandler {
                 self?.startARSession()
             case "setLocation":
                 print("setLocationCalled")
-                let arguments = call.arguments as! Array<Double>
-                guard arguments.count == 3 else {
+                let arguments = call.arguments as! Array<Any>
+                guard arguments.count == 4 else {
                     break
                 }
-                self?.setLocation(lat :arguments[0], long :arguments[1], alt : arguments[2] )
+                var lat = arguments[0] as! Double
+                var long = arguments[1] as! Double
+                var alt = arguments[2] as! Double
+                var name = arguments[3] as! String
+                
+                self?.setLocation(lat : lat, long : long, alt: alt, name: name)
             default:
                 print("Nothing")
+                
+                
             }
-            
         })
     }
     
@@ -52,8 +58,8 @@ class FlutterMethodHandler {
         self.window.makeKeyAndVisible()
     }
     
-    func setLocation(lat : Double, long : Double, alt : Double){
-        gameViewController.addNodeAtSpecifiedLocation(lat: lat, long: long, alt: alt)
+    func setLocation(lat : Double, long : Double, alt : Double, name : String){
+        gameViewController.addNodeAtSpecifiedLocation(lat: lat, long: long, alt: alt, name : name)
     }
     
     func dispatchLocation(location : CLLocation){

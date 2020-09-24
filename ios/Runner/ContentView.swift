@@ -1,6 +1,6 @@
 //
 //  ContentView.swift
-//  NoFluttAR
+//  FluttAR
 //
 //  Created by Lukas Brendle on 21.09.20.
 //
@@ -11,65 +11,66 @@ import ARKit
 import CoreLocation
 import ARKit_CoreLocation
 
-struct ContentView :View {
-    
-    var body: some View {
-        return ARViewContainer().edgesIgnoringSafeArea(.all)
-    }
-}
-
-class GameViewController: UIViewController, UIGestureRecognizerDelegate, ARSessionDelegate {
+class GameViewController: UIViewController, UIGestureRecognizerDelegate, ARSessionDelegate, ARSCNViewDelegate {
     
     @IBOutlet var arview : ARView!
     
     var sceneLocation : SceneLocationView!
     var locationManager: CLLocationManager!
     
-    var arTrackingType = SceneLocationView.ARTrackingType.worldTracking
+    var arTrackingType = SceneLocationView.ARTrackingType.orientationTracking
     var scalingScheme = ScalingScheme.normal
     var flutterMethodHandler : FlutterMethodHandler!
     
-    var continuallyAdjustNodePositionWhenWithinRange = false
-    var continuallyUpdatePositionAndScale = false
-    var annotationHeightAdjustmentFactor = 1
+    var continuallyAdjustNodePositionWhenWithinRange = true
+    var continuallyUpdatePositionAndScale = true
+    var annotationHeightAdjustmentFactor = 1.1
     
     override func viewDidLoad() {
-        print("Test")
-        
         super.viewDidLoad()
         locationManager = CLLocationManager()
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         locationManager.startUpdatingLocation()
         
-//        arview = ARViewContainer().makeUIView()
-//        arview.session.delegate = self
         view.isUserInteractionEnabled = true
 
-        sceneLocation = SceneLocationView.init(trackingType : .worldTracking)
+        sceneLocation = SceneLocationView.init(trackingType : art)
         sceneLocation.debugOptions = [.showFeaturePoints, .showWorldOrigin]
         sceneLocation.session.delegate = self
         sceneLocation.showAxesNode = true
-        sceneLocation.run()
+        sceneLocation.translatesAutoresizingMaskIntoConstraints = false
+        sceneLocation.arViewDelegate = self
+        sceneLocation.orientToTrueNorth = true
+        sceneLocation.locationEstimateMethod = LocationEstimateMethod.mostRelevantEstimate
+        sceneLocation.autoenablesDefaultLighting = true
+        sceneLocation.showsStatistics = true
         sceneLocation.isUserInteractionEnabled = true
         view.addSubview(sceneLocation)
+       
         setupGestures()
-        //view.addSubview(arview)
+    
         
         let coordinate = CLLocationCoordinate2D(latitude: 46.536671, longitude: 7.962324)
         let location = CLLocation(coordinate: coordinate, altitude: 4158)
-        //let image = UIImage(named: "pin")!
-        //let annotationNode = LocationAnnotationNode(location: location, image: image)
+    
         let annotationNode = LocationAnnotationNode(location: location,
                                                     view: UIView.prettyLabeledView(text: "Jungfrau", backgroundColor: UIColor.orange, borderColor: UIColor.black))
         addScenewideNodeSettings(annotationNode)
         sceneLocation.addLocationNodeWithConfirmedLocation(locationNode: annotationNode)
+        
+        sceneLocation.run()
     }
     
-    func addNodeAtSpecifiedLocation( lat : Double, long : Double, alt : Double){
+    func addNodeAtSpecifiedLocation( lat : Double, long : Double, alt : Double, name : String){
         let location = CLLocation(coordinate: CLLocationCoordinate2D(latitude: lat, longitude: long), altitude: alt)
-        let image = UIImage(named: "pin")!
-
-        let annotationNode = LocationAnnotationNode(location: location, image: image)
+        var annotationNode : LocationAnnotationNode!
+        if(!name.isEmpty){
+            annotationNode = LocationAnnotationNode(location: location,
+                                                    view: UIView.prettyLabeledView(text: name, backgroundColor: UIColor.lightGray, borderColor: UIColor.black))
+        } else {
+            let image = UIImage(named: "pin")!
+            annotationNode = LocationAnnotationNode(location: location, image: image)
+        }
         
         addScenewideNodeSettings(annotationNode)
         sceneLocation.addLocationNodeWithConfirmedLocation(locationNode: annotationNode)
@@ -110,8 +111,6 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate, ARSessi
         else { return }
         
         addObject(position: hitTest.worldCoordinates)
-        //let entity: Entity = hitTest.entity
-        //print(entity.name)
     }
     
     func addObject(position: SCNVector3) {
@@ -120,67 +119,16 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate, ARSessi
         let image = UIImage(named: "pin")!
         let currentLocationNode = LocationAnnotationNode(location: locationManager.location, image: image)
         
-      
-        sceneLocation.addLocationNodeWithConfirmedLocation(locationNode: currentLocationNode)
-        flutterMethodHandler.dispatchLocation(location: currentLocationNode.location)
+        let locationNode = LocationNode(location: locationManager.location)
+        sceneLocation.addLocationNodeWithConfirmedLocation(locationNode: locationNode)
+        flutterMethodHandler.dispatchLocation(location: locationNode.location)
+        
+        //sceneLocation.addLocationNodeWithConfirmedLocation(locationNode: currentLocationNode)
+        //flutterMethodHandler.dispatchLocation(location: currentLocationNode.location)
     }
     
 }
 
-struct ARViewContainer: UIViewRepresentable {
-    
-    func makeUIView(context: Context) -> ARView {
-        let arView = ARView(frame: .zero)
-        arView.debugOptions = [.showFeaturePoints]
-        let configuration = ARWorldTrackingConfiguration()
-        configuration.planeDetection = [.horizontal, .vertical]
-        arView.session.run(configuration)
-    
-        
-        let anchor = AnchorEntity(.plane([.horizontal, .vertical],
-                                         classification: [.wall, .table, .floor],
-                                         minimumBounds: [0.1, 0.1]))
-        
-        
-        
-//        let location = CLLocationCoordinate2D(46.6917499,7.7640721)
-//        let geoAnchor = ARGeoAnchor(coordinate: location)
-        // Load the "Box" scene from the "Experience" Reality File
-//        let boxAnchor = try! Experience.loadBox()
-        
-        // Add the box anchor to the scene
-        arView.scene.anchors.append(anchor)
-        
-        return arView
-    }
-    
-    func makeUIView() -> ARView {
-        let arView = ARView(frame: UIScreen.main.bounds)
-        arView.debugOptions = [.showFeaturePoints]
-        let configuration = ARWorldTrackingConfiguration()
-        configuration.planeDetection = [.horizontal, .vertical]
-        arView.session.run(configuration)
-        
-        
-        let anchor = AnchorEntity(.plane([.horizontal, .vertical],
-                                         classification: [.wall, .table, .floor],
-                                         minimumBounds: [0.1, 0.1]))
-        
-        
-        // Load the "Box" scene from the "Experience" Reality File
-        let boxAnchor = try! Experience.loadBox()
-        
-        // Add the box anchor to the scene
-        arView.scene.anchors.append(boxAnchor)
-        
-        return arView
-    }
-    
-    func updateUIView(_ uiView: ARView, context: Context) {
-    }
-
-    
-}
 
 extension UIView {
     /// Create a colored view with label, border, and rounded corners.

@@ -7,18 +7,10 @@ import 'package:fluttAR/Location.dart';
 import 'package:flutter/material.dart';
 import 'package:arkit_plugin/arkit_plugin.dart';
 import 'package:flutter/services.dart';
-import 'package:vector_math/vector_math_64.dart' as vector;
 
-bool USE_FIRESTORE_EMULATOR = false;
 String COLLECTION_NAME = "Locations";
 
 void main() {
-  //Firebase.initializeApp();
-  //WidgetsFlutterBinding.ensureInitialized();
-  //if (USE_FIRESTORE_EMULATOR) {
-  // FirebaseFirestore.instance.settings = Settings(
-  //     host: 'localhost:8080', sslEnabled: false, persistenceEnabled: false);
-  //}
   runApp(MaterialApp(home: MyApp()));
 }
 
@@ -71,7 +63,7 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> _startARSesssion() async {
     try {
-      final int result = await platform.invokeMethod('startARSession');
+      await platform.invokeMethod('startARSession');
       print("AR Session started");
     } on PlatformException catch (e) {
       print("AR Session not started - " + e.toString());
@@ -80,7 +72,6 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> _transmitLocationInformation(Location loc) async {
     try {
-      //Location loc = new Location(46.536671, 7.962324, 4158);
       List<double> list =
           {loc.latitude, loc.longitude, loc.meterOverNull}.toList();
       final int result = await platform.invokeMethod('setLocation', list);
