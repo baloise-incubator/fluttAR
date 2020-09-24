@@ -14,7 +14,14 @@ class ArPageWidget extends StatelessWidget {
   Widget build(BuildContext context) => Scaffold(
       body: Container(
           child: RaisedButton(
-        child: Text('start AR'),
+        child:
+
+            Container(
+              child: Image(image: AssetImage("assets/nerdy_nyan.gif")),
+            ),
+
+        // Text('start AR'),
+
         onPressed: _startARSesssionAndSetLocations,
       )));
 
