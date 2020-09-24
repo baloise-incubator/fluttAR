@@ -12,18 +12,20 @@ class ArPageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-      body: Container(
-          child: RaisedButton(
-        child:
+      body: Center(
+        child: Container(
+            child: RaisedButton(
+          child:
 
-            Container(
-              child: Image(image: AssetImage("assets/nerdy_nyan.gif")),
-            ),
+              Container(
+                child: Image(image: AssetImage("assets/nerdy_nyan.gif")),
+              ),
 
-        // Text('start AR'),
+          // Text('start AR'),
 
-        onPressed: _startARSesssionAndSetLocations,
-      )));
+          onPressed: _startARSesssionAndSetLocations,
+        )),
+      ));
 
   Future<void> _startARSesssionAndSetLocations() async {
     _startARSesssion();
