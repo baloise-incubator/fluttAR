@@ -23,20 +23,24 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate, ARSessi
     @IBOutlet var arview : ARView!
     
     var sceneLocation : SceneLocationView!
+    var locationManager: CLLocationManager!
     
-    var arTrackingType = SceneLocationView.ARTrackingType.orientationTracking
+    var arTrackingType = SceneLocationView.ARTrackingType.worldTracking
     var scalingScheme = ScalingScheme.normal
     var flutterMethodHandler : FlutterMethodHandler!
     
-    var continuallyAdjustNodePositionWhenWithinRange = true
-    var continuallyUpdatePositionAndScale = true
-    var annotationHeightAdjustmentFactor = 1.1
+    var continuallyAdjustNodePositionWhenWithinRange = false
+    var continuallyUpdatePositionAndScale = false
+    var annotationHeightAdjustmentFactor = 1
     
     override func viewDidLoad() {
         print("Test")
         
         super.viewDidLoad()
-     
+        locationManager = CLLocationManager()
+        locationManager.desiredAccuracy = kCLLocationAccuracyBest
+        locationManager.startUpdatingLocation()
+        
 //        arview = ARViewContainer().makeUIView()
 //        arview.session.delegate = self
         view.isUserInteractionEnabled = true
@@ -54,7 +58,6 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate, ARSessi
         let coordinate = CLLocationCoordinate2D(latitude: 46.536671, longitude: 7.962324)
         let location = CLLocation(coordinate: coordinate, altitude: 4158)
         //let image = UIImage(named: "pin")!
-
         //let annotationNode = LocationAnnotationNode(location: location, image: image)
         let annotationNode = LocationAnnotationNode(location: location,
                                                     view: UIView.prettyLabeledView(text: "Jungfrau", backgroundColor: UIColor.orange, borderColor: UIColor.black))
@@ -74,7 +77,7 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate, ARSessi
     
     func addScenewideNodeSettings(_ node: LocationNode) {
         if let annoNode = node as? LocationAnnotationNode {
-            annoNode.annotationHeightAdjustmentFactor = annotationHeightAdjustmentFactor
+            annoNode.annotationHeightAdjustmentFactor = Double(annotationHeightAdjustmentFactor)
         }
         node.scalingScheme = .normal
         
@@ -115,8 +118,10 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate, ARSessi
         print("adding object at point: \(position)")
         
         let image = UIImage(named: "pin")!
-        let currentLocationNode = LocationAnnotationNode(location: nil, image: image)
-        sceneLocation.addLocationNodeForCurrentPosition(locationNode: currentLocationNode)
+        let currentLocationNode = LocationAnnotationNode(location: locationManager.location, image: image)
+        
+      
+        sceneLocation.addLocationNodeWithConfirmedLocation(locationNode: currentLocationNode)
         flutterMethodHandler.dispatchLocation(location: currentLocationNode.location)
     }
     

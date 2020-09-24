@@ -19,6 +19,14 @@ class Location {
     var mapEntryAlt = new MapEntry("altitude", meterOverNull);
 
     map.addEntries({mapEntryLat, mapEntryLong, mapEntryAlt});
+    return map;
+  }
+
+  static Location fromDataStoreMap(Map<String, dynamic> map){
+    var latitude = map["latitude"];
+    var longitude = map["longitude"];
+    var meterOverNull = map["altitude"];
+    return new Location(latitude, longitude, meterOverNull);
   }
 
   String identifyingName(){
