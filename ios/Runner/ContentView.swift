@@ -34,7 +34,7 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate, ARSessi
         
         view.isUserInteractionEnabled = true
 
-        sceneLocation = SceneLocationView.init(trackingType : art)
+        sceneLocation = SceneLocationView.init(trackingType : arTrackingType)
         sceneLocation.debugOptions = [.showFeaturePoints, .showWorldOrigin]
         sceneLocation.session.delegate = self
         sceneLocation.showAxesNode = true
