@@ -40,9 +40,12 @@ class DataBaseHandler {
     });
   }
 
-  Future <> getInitialData() async {
+  Future getInitialData(Function function) async {
+    print("AR:INITIAL:CALLED");
     await Firebase.initializeApp();
-    CollectionReference collection = FirebaseFirestore.instance.collection(COLLECTION_NAME)
+    FirebaseFirestore.instance.collection(COLLECTION_NAME).snapshots().last.then((value) => {
+      function(value.docs.last)
+    });
 
   }
 

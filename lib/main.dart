@@ -22,20 +22,12 @@ class MyAppState extends State<MyApp> {
   );
 
   LatLng _center = LatLng(46.689520, 7.762714);
-  DataBaseHandler handler = DataBaseHandler();
-  ArPageWidget arPage;
-  MapPageWidget mapPage;
 
   @override
   void initState(){
     super.initState();
     GeolocatorPlatform.instance.getCurrentPosition().then((value) =>
     _center = LatLng(value.latitude, value.longitude));
-    arPage = ArPageWidget(handler);
-    mapPage = MapPageWidget(handler, _center, this);
-    //List<Function> functionList = new List<Function>();
-    //functionList.add((loc) =>{ mapPage.receivedLocationInformation(loc)});
-    //handler.addListeners(functionList);
   }
 
   int bottomSelectedIndex = 0;
@@ -78,8 +70,8 @@ class MyAppState extends State<MyApp> {
           pageChanged(index);
         },
         children: [
-          arPage,
-          mapPage,
+          ArPageWidget(),
+          MapPageWidget(_center, this),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(

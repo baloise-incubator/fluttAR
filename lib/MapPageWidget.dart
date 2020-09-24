@@ -1,5 +1,7 @@
 import 'dart:collection';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:fluttAR/DatabaseHandler.dart';
 import 'package:fluttAR/main.dart';
 import 'package:flutter/material.dart';
@@ -9,16 +11,17 @@ import 'Location.dart';
 class MapPageWidget extends StatelessWidget {
   GoogleMapController mapController;
 
+  static const String COLLECTION_NAME = "Locations";
+
   Set<Marker> _markers = new HashSet<Marker>();
   int markerIDCounter = 0;
   LatLng center;
-  DataBaseHandler handler;
-  MyAppState parentState;
 
-  MapPageWidget(DataBaseHandler handler, LatLng center, MyAppState parentState) {
-    this.handler = handler;
+  MyAppState state;
+
+  MapPageWidget( LatLng center, MyAppState appstate) {
     this.center = center;
-    this.parentState = parentState;
+    this.state = appstate;
   }
 
   void _onMapCreated(GoogleMapController controller) {
@@ -31,7 +34,7 @@ class MapPageWidget extends StatelessWidget {
   }
 
   void _setMarker(LatLng point, bool dontStore) {
-    this.parentState.setState(() {
+    this.state.setState(() {
       print("Updating state");
       final String markerIDVal = "ID${markerIDCounter}";
       markerIDCounter++;
@@ -43,9 +46,22 @@ class MapPageWidget extends StatelessWidget {
       );
       Location loc = Location(point.latitude, point.longitude, 1200);
       if (!dontStore) {
-        handler.persistToDB(loc);
+        persistToDB(loc);
       }
     });
+    //this.build(this.state.context);
+  }
+
+
+  Future<void> persistToDB(Location location) async {
+    await Firebase.initializeApp();
+    print("Saving information");
+    print(location.toDataStoreMap());
+    print(location.identifyingName());
+    FirebaseFirestore.instance
+        .collection(COLLECTION_NAME)
+        .doc(location.identifyingName())
+        .set(location.toDataStoreMap());
   }
 
   @override
