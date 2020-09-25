@@ -54,7 +54,7 @@ class FlutterMethodHandler {
         gameViewController = GameViewController()
         gameViewController.flutterMethodHandler = self
         gameViewController.view.frame = self.window.rootViewController?.view.frame ?? gameViewController.view.frame
-        gameViewController.modalPresentationStyle = .fullScreen
+        gameViewController.modalPresentationStyle = .formSheet
         self.window?.rootViewController?.present(gameViewController, animated: false)
         self.window.makeKeyAndVisible()
     }

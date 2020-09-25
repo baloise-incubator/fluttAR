@@ -18,7 +18,7 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate, ARSessi
     var sceneLocation : SceneLocationView!
     var locationManager: CLLocationManager!
     
-    var arTrackingType = SceneLocationView.ARTrackingType.orientationTracking
+    var arTrackingType = SceneLocationView.ARTrackingType.worldTracking
     var scalingScheme = ScalingScheme.normal
     var flutterMethodHandler : FlutterMethodHandler!
     
